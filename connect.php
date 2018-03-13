@@ -11,7 +11,7 @@ function connect(){
 //    $databaseName = env("MYSQL_INSTANCE_NAME", "temp_db");
 //    $username = env("MYSQL_USERNAME", "root");
 //    $password = env("MYSQL_PASSWORD", "Gd6lhOSsY");
-    $serverName = env("MYSQL_PORT_3306_TCP_ADDR", "192.168.1.12");
+    $serverName = env("MYSQL_PORT_3306_TCP_ADDR", "127.0.0.1");
     $databaseName = env("MYSQL_INSTANCE_NAME", "cloud_ware");
     $username = env("MYSQL_USERNAME", "root");
     $password = env("MYSQL_PASSWORD", "Jsym_20170607");
