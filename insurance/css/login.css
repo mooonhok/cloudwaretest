@@ -1,0 +1,173 @@
+/*
+* @Author: boycui
+* @Date:   2017-09-05 10:29:30
+* @Last Modified by:   boycui
+* @Last Modified time: 2017-09-07 15:15:20
+*/
+*{
+   margin: 0;
+   padding: 0;
+   font-family: "微软雅黑";
+}
+.box{
+	width: 100%;
+	height: 100%;
+	background: #658DCB;
+	position:fixed;
+}
+.top{
+	width: 100%;
+	height: 60px;
+	background: white;
+}
+.top_1{
+	width: 150px;
+	height: 60px;
+	float: left;
+	margin-left: 15%;
+}
+.top_1 img{
+	width: 100%;
+}
+.top_2{
+	width: 250px;
+	height: 60px;
+	float: right;
+	margin-right: 15%;
+}
+.top_2 img{
+	width: 100%;
+}
+.top_3{
+	width: 100%;
+	height: 5px;
+	background: blue;
+}
+.center{
+	width: 600px;
+	height: 600px;
+	margin:0 auto;
+	background: #658DCB;
+}
+.center_1{
+	float: left;
+	margin-left: 120px;
+	width: 360px;
+	height: 40px;
+	text-align: center;
+	line-height: 40px;
+	font-size: 20px;
+	font-weight: bold;
+	margin-top: 100px;
+}
+.xian{
+	float: left;
+	margin-left: 120px;
+	width: 360px;
+	height: 2px;
+	background: white;
+}
+.center_2{
+	float: left;
+	width:360px;
+	margin-left: 120px;
+	height: 35px;
+	margin-top: 25px;
+}
+.center_3{
+	float: left;
+	width: 360px;
+	margin-left: 120px;
+	height: 35px;
+	margin-top: 25px;
+}
+
+.center_2_2{
+	float: left;
+	width: 360px;
+	height: 35px; 
+	background: white;
+}
+.center_3_2{
+	float: left;
+	width: 360px;
+	height: 35px;
+	background: white;
+}
+.center_2_2 input{
+	width: 340px;
+	height: 35px;
+	background: white;
+	list-style: none;
+	outline-style: none;
+	border: 0;
+	font-size: 16px;
+	display: inline-block;
+	float: left;
+	margin-left: 20px;
+}
+.center_3_2 input{
+	width: 340px;
+	height: 35px;
+	background: white;
+	list-style: none;
+	outline-style: none;
+	border: 0;
+	font-size: 16px;
+	display: inline-block;
+	float: left;
+	margin-left: 20px;
+}
+.login{
+	width: 360px;
+	height: 35px;
+	line-height: 35px;
+	background: #204C8D;
+	color: white;
+	font-size: 18px;
+	text-align: center;
+	float: left;
+	margin-left: 120px;
+	margin-top: 20px;
+	cursor: pointer;
+}
+.center_4{
+	width: 360px;
+	float: left;
+	margin-top: 30px;
+	margin-left: 120px;
+	height: 50px;
+}
+.center_4_1{
+	float: left;
+	width: 200px;
+	height: 35px;
+}
+.center_4_1 input{
+	width: 200px;
+	height: 35px;
+	text-align: center;
+	list-style: none;
+	outline-style: none;
+	border: 0;
+	font-size: 16px;
+}
+.center_4_2{
+	float: right;
+	width: 150px;
+	height: 50px;
+}
+.verify{
+	width: 150px;
+	height: 35px;
+}
+.text{
+	width: 150px;
+	height: 15px;
+	text-align: center;
+	font-size: 12px;
+	line-height: 12px;
+	margin: 5px 0;
+	cursor: pointer;
+}
+

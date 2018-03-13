@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Access-Control-Allow-Origin" content="*">
+	<link rel="icon" href="head.ico" type="image/x-icon"/>
+	<title>保险公司人员登录</title>
+	<link rel="stylesheet" href="css/login.css">
+	<script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.session.js"></script>
+</head>
+<body>
+	<div class="box">
+		<div class="top">
+			<div class="top_1">
+				<img src="images/1.jpg" alt="">
+			</div>
+			<div class="top_2">
+				<img src="images/2.jpg" alt="">
+			</div>
+		</div>
+		<div class="top_3"></div>	
+		<div class="center">
+			<div class="center_1">保险公司人员登录</div>		
+		<div class="center_2">
+			<div class="center_2_2">
+				<input type="text" id="username" placeholder="姓名">
+			</div>
+		</div>
+		<div class="center_3">
+			<div class="center_3_2">
+				<input type="password" id="password" placeholder="密码">
+			</div>
+			</div>
+			<div class="center_4">
+			<div class="center_4_1">
+				<input type="text" id="identify" placeholder="请输入验证码" autofocus="">
+			</div>
+			<div class="center_4_2">
+				<div class="verify">
+					<canvas id="canvas" width="150" height="35">		
+					</canvas>
+				</div>
+				<div class="text" id="changeImg" >看不清楚换一张</div>
+			</div>
+		</div>
+		<div class="login" id="signin">
+			确 认 登 录
+		</div>	
+		</div>
+		<div style="clear: both;"></div>	
+	</div>	
+</body>
+		<script type="text/javascript">
+	var canvas;
+	var context;
+	var width;
+	var height;
+	var code="";	
+	function randomNum(min,max){		
+		return Math.floor(Math.random()*(max-min)+min);
+	}
+	function randomColor(min,max){
+		var r = randomNum(min,max);
+		var g = randomNum(min,max);
+		var b = randomNum(min,max);
+		return "rgb("+r+","+g+","+b+")";
+	}
+	//生成随机数
+	function randomCode(){
+		var code1 = "";
+		var str = 'ABCEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789';
+		for(var i = 0;i<4;i++){
+			var txt = str[randomNum(0,str.length)];
+			context.font = "20px simHei";
+			context.fillStyle = randomColor(35,150);
+			var x = 10+i*25;
+			var y = randomNum(25,30);
+			var deg = randomNum(-15,15);
+			context.rotate(deg*Math.PI/180);
+			context.fillText(txt,x,y);
+			context.rotate(-deg*Math.PI/180);
+			code1 +=txt;
+			code = code1;
+		}
+		 console.log(code1);
+	}	
+	function randomArc(){
+
+		for(var i = 0;i<=100;i++){
+		context.fillStyle = randomColor(0,255);
+		context.beginPath();
+		context.arc(randomNum(0,width),randomNum(0,height), 1, 0, 2*Math.PI);
+		context.fill();
+		}
+	}
+	function randomLine(){
+		for (var i = 0; i < 8 ; i++) {
+			context.strokeStyle = randomColor(50,160);
+			context.beginPath();
+			context.moveTo(randomNum(0,width),randomNum(0,height));
+			context.lineTo(randomNum(0,width),randomNum(0,height));
+			context.stroke();
+		}
+	}
+	function draw(){
+		canvas = document.getElementById('canvas');
+		context = canvas.getContext('2d');
+		width = canvas.width;
+		height = canvas.height;
+		context.fillStyle =randomColor(150,220);
+	    context.fillRect(0,0,width,height);
+		randomCode();
+		randomArc();
+		randomLine();
+	}	
+	draw();
+  document.getElementById("changeImg").onclick = function(e){
+    e.preventDefault();
+    draw();
+  }	
+	document.getElementById("signin").onclick=function(){
+	var input = document.getElementById('identify').value;
+	console.log(input);
+		if(input.length <= 0){
+			alert("请输入验证码")
+		}else if(input.toUpperCase() != code.toUpperCase()){
+			alert("验证码输入错误"); 	
+        document.getElementById("identify").value = "";//清空文本框  
+         }else if(input.toUpperCase() == code.toUpperCase()){		
+			alert('验证通过');
+			var name=$("#username").val();
+			var pwd=$("#password").val();
+			if(name==null ||name==""||pwd==null||pwd==""){
+				alert("用户名或密码不能为空");
+			}else{
+			$.ajax({
+   		  	  url:"http://api.uminfo.cn/rechange_insurance.php/userlogin",
+   		  	  dataType:'json',
+   		  	  type:'post',
+   		  	  ContentType:"application/json;charset=utf-8",
+   		  	  data:JSON.stringify({
+   		  	       username:name,
+   		  	       password:pwd
+   		  	  }),
+   		  	  success:function(msg){
+   		  	  	if(msg.result==0){	
+   		  	  	    $.session.set('userid',msg.user.id);
+   		  	  	    var user=$.session.get('userid');
+   		  	  	    if(user!=null||user!=""){
+   		  	  	    	window.location.href = "http://insurance.uminfo.cn/index.html";
+   		  	  	    }
+   		  	  	}else{
+   		  	  		alert(msg.desc);
+   		  	  	}
+   		  	  },
+   		  	  error:function(xhr) {
+   		  	  	alert(xhr.responseText);
+   		  	  }
+		});
+		}
+	}
+}
+	</script>
+</html>
