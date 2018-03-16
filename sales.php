@@ -26,7 +26,7 @@ $app->get('/usersign',function ()use($app){
         $selectStaement=$database->select()
             ->from('sales')
             ->where('exist','=',0)
-            ->where('sales_id','=',$username);
+            ->where('telephone','=',$username);
         $stmt=$selectStaement->execute();
         $data=$stmt->fetch();
          if ($data!=null){
@@ -34,7 +34,7 @@ $app->get('/usersign',function ()use($app){
                  ->from('sales')
                  ->where('password','=',$password)
                  ->where('exist','=',0)
-                 ->where('sales_id','=',$username);
+                 ->where('telephone','=',$username);
              $stmt=$selectStaement->execute();
              $data2=$stmt->fetch();
              if($data2!=null){
@@ -655,11 +655,22 @@ $app->post('/addsales',function()use($app){
                                        }else if($data5['team_id']>9&&$data5['team_id']<100){
                                          $sales_id='MT0'.$data5['team_id'];
                                        }
-                                       $selectStatement = $database->select()
-                                           ->from('sales')
-                                           ->where('team_id','=',$data5['team_id']);
-                                       $stmt = $selectStatement->execute();
-                                       $data6 = $stmt->fetchAll();
+                                       $data6=array();
+                                       if($data5['team_id']==null){
+                                           $selectStatement = $database->select()
+                                               ->from('sales')
+                                               ->whereNull('team_id');
+                                           $stmt = $selectStatement->execute();
+                                           $data6 = $stmt->fetchAll();
+                                       }else{
+                                           $selectStatement = $database->select()
+                                               ->from('sales')
+                                               ->where('team_id','=',$data5['team_id']);
+                                           $stmt = $selectStatement->execute();
+                                           $data6 = $stmt->fetchAll();
+                                       }
+
+
                                        $num2=count($data6)+1;
                                        if(count($data6)<10){
                                            $sales_id.='000'.$num2.'';
@@ -683,7 +694,7 @@ $app->post('/addsales',function()use($app){
                                        $stmt = $selectStatement->execute();
                                        $data10 = $stmt->fetch();
                                        $arrays['id']=$data10['id'];
-                                       echo json_encode(array('result' => '0', 'desc' => '添加成功','sales'=>$arrays));
+                                       echo json_encode(array('result' => '0', 'desc' => '添加成功','sales'=>$arrays,'data'=>$data6));
                                    }else{
                                        echo json_encode(array('result' => '8', 'desc' => '上一级不能为空','sales'=>''));
                                    }
@@ -957,7 +968,7 @@ $app->post('/addSaleTenant',function()use($app) {
                                                     ->values(array($company,$from_city_id,$num,0,$business_l,$business_l_p
                                                     ,$sales_id,$address,$order_t_p, $trans_c_p
                                                     ,$service_items,$c_introduction,
-                                                        $begin_time,$qq,$email,0,$tenant_id,$tenant_id,$longitude,$latitude,$jcompany,$ad_img1,$ad_img2,$ad_img3,$ad_img4,$ad_img5,$ad_img6,$ad_img7,$order_img));
+                                                        $begin_time,$qq,$email,0,$tenant_num,$tenant_id,$longitude,$latitude,$jcompany,$ad_img1,$ad_img2,$ad_img3,$ad_img4,$ad_img5,$ad_img6,$ad_img7,$order_img));
                                                 $insertId = $insertStatement->execute(false);
 
                                                 if($insertId!=""||$insertId!=null){
@@ -978,9 +989,9 @@ $app->post('/addSaleTenant',function()use($app) {
                                                     $insertStatement = $database->insert(array('tenant_id','staff_id','username','password'
                                                     ,'name','telephone','position','status','permission','bg_img','head_img','exist'))
                                                         ->into('staff')
-                                                        ->values(array($data4['tenant_id'],100001,$username,encode('888888','cxphp'),$contact_name,$telephone,'负责人',1,1111111,$file_url.'client/skin/bg1.jpg',$file_url."staff/5230001_head.jpg",0));
+                                                        ->values(array($data4['tenant_id'],100001,$username,encode('888888','cxphp'),$contact_name,$telephone,'演示员',1,1111111,$file_url.'client/skin/bg1.jpg',$file_url."staff/5230001_head.jpg",0));
                                                     $insertId = $insertStatement->execute(false);
-                                                    echo json_encode(array('result'=>'0','desc'=>'添加成功'));
+                                                    echo json_encode(array('result'=>'0','desc'=>'添加成功','tenant_id'=>$tenant_id,'tenant_num'=>$tenant_num));
 //                                                    $app->redirect('http://www.uminfo.cn/zhuce.html?desc=企业登记成功');
                                                 }else{
 //                                                    $app->redirect('http://www.uminfo.cn/zhuce.html?desc=添加租户信息失败');
@@ -1021,6 +1032,294 @@ $app->post('/addSaleTenant',function()use($app) {
 //        }
     }else{
         echo json_encode(array("result"=>"15","desc"=>"缺少公司名称"));
+    }
+});
+
+$app->options('/addSaleLorry',function()use($app){
+    $app->response->headers->set('Access-Control-Allow-Origin','*');
+    $app->response->headers->set('Content-Type','application/json');
+    $app->response->headers->set("Access-Control-Allow-Methods", "POST");
+    $app->response->headers->set("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,tenant-id");
+});
+$app->post('/addSaleLorry',function()use($app) {
+    $app->response->headers->set('Access-Control-Allow-Origin','*');
+    $app->response->headers->set('Content-Type', 'application/json');
+    $tenant_id = $app->request->headers->get("tenant-id");
+    $body = $app->request->getBody();
+    $body = json_decode($body);
+    $database = localhost();
+    $lorry_id= $body->lorry_id;
+    $plate_number= $body->plate_number;
+    $driver_name= $body->driver_name;
+    $driver_phone= $body->driver_phone;
+    $array = array();
+    foreach ($body as $key => $value) {
+        $array[$key] = $value;
+    }
+    if($tenant_id!=null||$tenant_id!=''){
+        if($lorry_id!=null||$lorry_id!=''){
+            if($plate_number!=null||$plate_number!=''){
+                if($driver_name!=null||$driver_name!=''){
+                    if($driver_phone!=null||$driver_phone!=''){
+                        $selectStatement = $database->select()
+                            ->from('app_lorry')
+                            ->where('plate_number', '=', $plate_number)
+                            ->where('name', '=', $driver_name)
+                            ->where('exist', '=', 0)
+                            ->where('phone', '=', $driver_phone);
+                        $stmt = $selectStatement->execute();
+                        $data1 = $stmt->fetch();
+
+                        $selectStatement = $database->select()
+                            ->from('lorry')
+                            ->where('tenant_id', '=', $tenant_id)
+                            ->where('exist','=',0)
+                            ->where('plate_number', '=', $plate_number)
+                            ->where('driver_name', '=', $driver_name)
+                            ->where('driver_phone', '=', $driver_phone);
+                        $stmt = $selectStatement->execute();
+                        $data4 = $stmt->fetch();
+
+                        $selectStatement = $database->select()
+                            ->from('lorry')
+                            ->where('exist','=',0)
+                            ->where('tenant_id', '=', $tenant_id)
+                            ->where('driver_phone', '=', $driver_phone);
+                        $stmt = $selectStatement->execute();
+                        $data5 = $stmt->fetch();
+
+                        $selectStatement = $database->select()
+                            ->from('lorry');
+                        $stmt = $selectStatement->execute();
+                        $data = $stmt->fetchAll();
+
+//                        if(!$data1){
+//                            $password1=123456;
+//                            $str1=str_split($password1,3);
+//                            $password=null;
+//                            for ($x=0;$x<count($str1);$x++){
+//                                $password.=$str1[$x].$x;
+//                            }
+//                            $insertStatement = $database->insert(array('lorry_id','plate_number','driver_name','driver_phone','password','flag','driving_license','vehicle_travel_license'))
+//                                ->into('lorry')
+//                                ->values(array((count($data)+100000001),$plate_number,$driver_name,$driver_phone,$password,$flag,"http://files.uminfo.cn:8000/lorry/photo1.png","http://files.uminfo.cn:8000/lorry/photo2.png"));
+//                            $insertId = $insertStatement->execute(false);
+//                            $array['tenant_id']=$tenant_id;
+//                            $array['exist']=0;
+//                            $array['driving_license']="http://files.uminfo.cn:8000/lorry/photo1.png";
+//                            $array['vehicle_travel_license']="http://files.uminfo.cn:8000/lorry/photo2.png";
+//
+//                            $insertStatement = $database->insert(array_keys($array))
+//                                ->into('lorry')
+//                                ->values(array_values($array));
+//                            $insertId = $insertStatement->execute(false);
+//                        }
+                        if($data5){
+                            echo json_encode(array("result" => "9", "desc" => "该电话号码已经注册过了"));
+                        }else{
+                            if(!$data1){
+                                echo json_encode(array("result" => "10", "desc" => "请司机下载交付帮手注册"));
+                            }else{
+                                if(!$data4){
+                                    $array['tenant_id']=$tenant_id;
+                                    $array['exist']=0;
+                                    $insertStatement = $database->insert(array_keys($array))
+                                        ->into('lorry')
+                                        ->values(array_values($array));
+                                    $insertId = $insertStatement->execute(false);
+                                    echo json_encode(array("result" => "0", "desc" => "success"));
+                                }else{
+                                    echo json_encode(array("result" => "1", "desc" => "司机已经添加"));
+                                }
+                            }
+
+                        }
+                    }else{
+                        echo json_encode(array("result" => "4", "desc" => "缺少驾驶员手机号码"));
+                    }
+                }else{
+                    echo json_encode(array("result" => "5", "desc" => "缺少驾驶员名字"));
+                }
+            }else{
+                echo json_encode(array("result" => "6", "desc" => "缺少车牌号"));
+            }
+        }else{
+            echo json_encode(array("result" => "7", "desc" => "缺少车辆id"));
+        }
+    }else{
+        echo json_encode(array("result" => "8", "desc" => "缺少租户id"));
+    }
+});
+
+$app->options('/addSaleGood',function()use($app){
+    $app->response->headers->set('Access-Control-Allow-Origin','*');
+    $app->response->headers->set('Content-Type','application/json');
+    $app->response->headers->set("Access-Control-Allow-Methods", "POST");
+    $app->response->headers->set("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,tenant-id");
+});
+
+$app->post('/addSaleGood',function()use($app) {
+    $app->response->headers->set('Access-Control-Allow-Origin','*');
+    $app->response->headers->set('Content-Type', 'application/json');
+    $database = localhost();
+    $tenant_id = $app->request->headers->get("tenant-id");
+    $body = $app->request->getBody();
+    $body = json_decode($body);
+    $goods_id=$body->goods_id;
+    $order_id = $body->order_id;
+    $goods_name = $body->goods_name;
+    $goods_weight= $body->goods_weight;
+    $goods_package_id= $body->goods_package_id;
+    $goods_count=$body->goods_count;
+    $goods_value=$body->goods_value;
+    $array=array();
+    foreach($body as $key=>$value){
+        $array[$key]=$value;
+    }
+    if($tenant_id!=null||$tenant_id!=''){
+        if($goods_id!=null||$goods_id!=''){
+            if($order_id!=null||$order_id!=''){
+                if($goods_name!=null||$goods_name!=''){
+                    if($goods_weight!=null||$goods_weight!=''){
+                        if($goods_count!=null||$goods_count!=''){
+                            $array['tenant_id']=$tenant_id;
+                            $array['exist']=0;
+                            $insertStatement = $database->insert(array_keys($array))
+                                ->into('goods')
+                                ->values(array_values($array));
+                            $insertId = $insertStatement->execute(false);
+                            echo json_encode(array("result" => "0", "desc" => "success"));
+                        }else{
+                            echo json_encode(array("result" => "1", "desc" => "缺少货物数量"));
+                        }
+                    }else{
+                        echo json_encode(array("result" => "2", "desc" => "缺少货物重量"));
+                    }
+                }else{
+                    echo json_encode(array("result" => "3", "desc" => "缺少货物名称"));
+                }
+            }else{
+                echo json_encode(array("result" => "4", "desc" => "缺少运单id"));
+            }
+        }else{
+            echo json_encode(array("result" => "5", "desc" => "缺少货物id"));
+        }
+    }else{
+        echo json_encode(array("result" => "6", "desc" => "缺少租户id"));
+    }
+});
+
+$app->options('/addSaleOrder',function()use($app){
+    $app->response->headers->set('Access-Control-Allow-Origin','*');
+    $app->response->headers->set('Content-Type','application/json');
+    $app->response->headers->set("Access-Control-Allow-Methods", "POST");
+    $app->response->headers->set("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,tenant-id");
+});
+$app->post('/addSaleOrder', function () use ($app) {
+    $app->response->headers->set('Access-Control-Allow-Origin','*');
+    $app->response->headers->set('Content-Type', 'application/json');
+    $tenant_id = $app->request->headers->get("tenant-id");
+    $database = localhost();
+    $body = $app->request->getBody();
+    $body = json_decode($body);
+    $order_id = $body->order_id;
+    $sender_id = $body->sender_id;
+    $receiver_id=$body->receiver_id;
+    $array=array();
+    foreach($body as $key=>$value){
+        $array[$key]=$value;
+    }
+    if ($sender_id != null || $sender_id != "") {
+        if ($receiver_id != null || $receiver_id > 0) {
+            if ($order_id != null || $order_id != "") {
+                $selectStatement = $database->select()
+                    ->from('orders')
+                    ->where('tenant_id', '=', $tenant_id)
+                    ->where('order_id', '=', $order_id);
+                $stmt = $selectStatement->execute();
+                $data = $stmt->fetch();
+                if($data){
+                    echo json_encode(array("result" => "5", "desc" => "运单id重复"));
+
+                }else{
+                    if($tenant_id!=null||$tenant_id!=''){
+                        $array["is_schedule"]=0;
+                        $array["is_transfer"]=0;
+                        $array['exist']=0;
+                        $array['tenant_id']=$tenant_id;
+                        $insertStatement = $database->insert(array_keys($array))
+                            ->into('orders')
+                            ->values(array_values($array));
+                        $insertId = $insertStatement->execute(false);
+                        echo json_encode(array("result" => "0", "desc" => "success"));
+                    }else{
+                        echo json_encode(array("result" => "4", "desc" => "缺少租户id"));
+                    }
+                }
+
+            } else {
+                echo json_encode(array("result" => "3", "desc" => "缺少运单id"));
+            }
+        } else {
+            echo json_encode(array("result" => "2", "desc" => "缺少收货人id"));
+        }
+    } else {
+        echo json_encode(array("result" => "1", "desc" => "缺少发货人id"));
+    }
+});
+
+$app->options('/addSaleCustomer',function()use($app){
+    $app->response->headers->set('Access-Control-Allow-Origin','*');
+    $app->response->headers->set('Content-Type','application/json');
+    $app->response->headers->set("Access-Control-Allow-Methods", "POST");
+    $app->response->headers->set("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,tenant-id");
+});
+$app->post('/addSaleCustomer',function()use($app) {
+    $app->response->headers->set('Access-Control-Allow-Origin','*');
+    $app->response->headers->set('Content-Type', 'application/json');
+    $database = localhost();
+    $tenant_id = $app->request->headers->get("tenant-id");
+    $body = $app->request->getBody();
+    $body = json_decode($body);
+    $customer_id=$body->customer_id;
+    $customer_name = $body->customer_name;
+    $customer_phone = $body->customer_phone;
+    $customer_city_id = $body->customer_city_id;
+    $customer_address = $body->customer_address;
+    $array=array();
+    foreach($body as $key=>$value){
+        $array[$key]=$value;
+    }
+    if($tenant_id!=null||$tenant_id!=''){
+        if($customer_id!=null||$customer_id!=''){
+            if($customer_name!=null||$customer_name!=''){
+                if($customer_phone!=null||$customer_phone!=''){
+                    if($customer_city_id!=null||$customer_city_id!=''){
+                        if($customer_address!=null||$customer_address!=''){
+                            $array['tenant_id']=$tenant_id;
+                            $array['exist']=0;
+                            $insertStatement = $database->insert(array_keys($array))
+                                ->into('customer')
+                                ->values(array_values($array));
+                            $insertId = $insertStatement->execute(false);
+                            echo json_encode(array("result" => "0", "desc" => "success"));
+                        }else{
+                            echo json_encode(array("result" => "2", "desc" => "缺少用户城市的地址"));
+                        }
+                    }else{
+                        echo json_encode(array("result" => "3", "desc" => "缺少用户的城市id"));
+                    }
+                }else{
+                    echo json_encode(array("result" => "4", "desc" => "缺少用户手机"));
+                }
+            }else{
+                echo json_encode(array("result" => "5", "desc" => "缺少用户名字"));
+            }
+        }else{
+            echo json_encode(array("result" => "6", "desc" => "缺少用户id"));
+        }
+    }else{
+        echo json_encode(array("result" => "7", "desc" => "缺少租户id"));
     }
 });
 $app->run();

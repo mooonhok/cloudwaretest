@@ -75,6 +75,45 @@ $app->post('/client_version',function()use($app){
 });
 
 
+$app->get('/getMust',function()use($app){
+    $app->response->headers->set('Access-Control-Allow-Origin','*');
+    $app->response->headers->set('Content-Type','application/json');
+    $now_version = $app->request->get("now_version");
+    $database = localhost();
+    $selectStatement = $database->select()
+        ->from('client')
+        ->where('is_must','=',1)
+        ->orderBy('id','DESC')
+        ->limit(1);
+    $stmt = $selectStatement->execute();
+    $data = $stmt->fetch();
+    if($data!=null){
+      $aa=explode(".",$data['version']);
+      $bb=explode(".",$now_version);
+      if($aa[0]>$bb[0]){
+          echo  json_encode(array("result"=>"0","desc"=>"success","client"=>$data));
+      }else if($aa[0]==$bb[0]){
+          if($aa[1]>$bb[1]){
+              echo  json_encode(array("result"=>"0","desc"=>"success","client"=>$data));
+          }else if($aa[1]==$bb[1]){
+              if($aa[2]>$bb[2]){
+                  echo  json_encode(array("result"=>"0","desc"=>"success","client"=>$data));
+              }else if($aa[2]==$bb[2]){
+                  echo  json_encode(array("result"=>"0","desc"=>"success","client"=>null));
+              }else{
+                  echo  json_encode(array("result"=>"0","desc"=>"success","client"=>null));
+              }
+          }else{
+              echo  json_encode(array("result"=>"0","desc"=>"success","client"=>null));
+          }
+      }else{
+          echo  json_encode(array("result"=>"0","desc"=>"success","client"=>null));
+      }
+    }else{
+        echo  json_encode(array("result"=>"0","desc"=>"success","client"=>null));
+    }
+});
+
 $app->run();
 
 function file_url(){
@@ -84,4 +123,5 @@ function file_url(){
 function localhost(){
     return connect();
 }
+
 ?>
