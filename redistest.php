@@ -1,7 +1,8 @@
-<?php
-$redis = new Redis();
-$redis->connect('127.0.0.1', 6379);
-$redis->set('cat', 10);
-$key_1 = $redis->get('cat');
-echo $key_1;
+<?php   
+//Connecting to Redis server on localhost
+   $redis = new Redis();
+   $redis->connect('127.0.0.1', 6379);
+   echo "Connection to server sucessfully";
+   //check whether server is running or not
+   echo "Server is running: ".$redis->ping();
 ?>
