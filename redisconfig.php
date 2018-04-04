@@ -45,8 +45,8 @@ class Redis
     {
         $this->attr  =    array_merge($this->attr,$attr);
         $this->redis =    new Redis();
-        $this->port  =    $config['port'] ? $config['port'] : 6379;
-        $this->host  =    $config['host'];
+        $this->port  =  "127.0.0.1:6379";
+        $this->host  =    "";
         $this->redis->connect($this->host, $this->port, $this->attr['timeout']);
 
         if($config['auth'])
