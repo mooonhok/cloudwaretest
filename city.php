@@ -96,6 +96,12 @@ $app->post('/addpackage',function()use($app){
     }
 });
 
+$app->get('/test',function ()use($app){
+    $app->response->headers->set('Access-Control-Allow-Origin','*');
+    $app->response->headers->set('Content-Type','application/json');
+    echo '竹制品';
+});
+
 
 $app->run();
 
